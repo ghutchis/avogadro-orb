@@ -1,0 +1,31 @@
+# Written by copier so that `copier update` can pull in later template
+# improvements. Do not edit by hand; commit it alongside the project.
+_commit: v0.1.0
+_src_path: /Users/ghutchis/Devel/plugins/avogadro-energy-template
+author_email: geoff.hutchison@gmail.com
+author_name: Geoff Hutchison
+build_backend: hatchling
+conda_dependencies: ''
+description: Energy models using Orbital Materials Orb force fields
+example_backend: ase
+github_user: ghutchis
+include_charges: false
+include_setup: true
+include_tests: true
+include_user_options: false
+license: BSD-3-Clause
+model_description: Calculate OrbMol-v2 energies and gradients
+model_identifier: OrbMol-v2
+model_name: OrbMol-v2
+platforms:
+- osx-arm64
+- linux-64
+plugin_name: avogadro-orb
+pypi_dependencies: orb-models>=0.6
+python_requires: '3.12'
+support_batch: false
+support_elements: 1, 6-8, 13, 28-29, 46-47, 78-79
+support_hessians: false
+support_ions: true
+support_radicals: true
+support_unit_cell: true

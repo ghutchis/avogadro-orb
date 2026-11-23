@@ -1,0 +1,102 @@
+[project]
+name = "avogadro-orb"
+version = "0.1.0"
+description = "Energy models using Orbital Materials Orb force fields"
+authors = [{name = "Geoff Hutchison", email = "geoff.hutchison@gmail.com"}]
+license = "BSD-3-Clause"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+# The "avogadro" wheel provides avogadro.energy, the binary protocol helper
+# this plugin builds on, so there is no copy of the protocol code to maintain
+# here. It brings numpy with it.
+dependencies = ["avogadro>=2.1.0", "ase>=3.25", "orb-models>=0.7.0"]
+
+# Avogadro runs a feature of this plugin as:
+#     pixi run avogadro-orb <identifier> --protocol binary-v1
+# The entry point name must begin with "avogadro-" for Avogadro to find it, and
+# by convention it is the plugin name itself.
+[project.scripts]
+avogadro-orb = "avogadro_orb:main"
+# Avogadro runs the "-setup" entry point once, after installing the plugin.
+avogadro-orb-setup = "avogadro_orb:setup"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/avogadro_orb"]
+
+# --- Pixi ------------------------------------------------------------------
+
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+platforms = ["osx-arm64", "linux-64"]
+
+[tool.pixi.dependencies]
+python = ">=3.12,<3.13"
+
+# Installing the plugin itself as an editable dependency is what lets Avogadro
+# invoke the entry point with `pixi run`.
+[tool.pixi.pypi-dependencies]
+avogadro_orb = { path = ".", editable = true }
+
+[tool.pixi.tasks]
+setup = "avogadro-orb-setup"
+
+# pytest lives in a separate environment so that it is not installed alongside
+# the plugin when Avogadro sets it up for a user. `pixi run test` finds the
+# task there automatically.
+[tool.pixi.feature.test.dependencies]
+pytest = "*"
+
+[tool.pixi.feature.test.tasks]
+test = "pytest"
+
+[tool.pixi.environments]
+default = { solve-group = "default" }
+test = { features = ["test"], solve-group = "default" }
+
+# --- Avogadro --------------------------------------------------------------
+
+[tool.avogadro]
+minimum-avogadro-version = "2.0"
+
+# Each feature is an entry in an array of tables, keyed by feature type. The
+# other supported types are electrostatic-models, file-formats, input-generators
+# and menu-commands.
+#
+# `protocol = "binary-v1"` selects the framed binary exchange implemented by
+# avogadro.energy. Omitting it selects the older line-based text protocol, which
+# cannot carry batches or Hessians.
+#
+# The support.* keys are promises Avogadro holds you to: it refuses to run the
+# model on a molecule outside them, so they must match what the code below
+# actually does.
+[[tool.avogadro.energy-models]]
+identifier = "OrbMol-v2"
+model-name = "OrbMol-v2"
+description = "Orb OrbMol-v2 (OMol25 + OPoly26, wB97M-V/def2-TZVPD) for molecules and periodic systems, with charge and spin. Apache-2.0 code and weights."
+input-format = "cjson"
+protocol = "binary-v1"
+support.gradients = true
+support.elements = "1-86, 88-99"
+support.unit-cell = true
+support.ions = true
+support.radicals = true
+support.batch = false
+support.hessians = false
+
+[[tool.avogadro.energy-models]]
+identifier = "Orb-v3"
+model-name = "Orb-v3 (OMat24)"
+description = "Orb-v3 conservative (OMat24 PBE) for neutral, closed-shell periodic materials. Apache-2.0 code and weights."
+input-format = "cjson"
+protocol = "binary-v1"
+support.gradients = true
+support.elements = "1-88"
+support.unit-cell = true
+support.ions = false
+support.radicals = false
+support.batch = false
+support.hessians = false
