@@ -57,10 +57,17 @@ test = "pytest"
 default = { solve-group = "default" }
 test = { features = ["test"], solve-group = "default" }
 
+# --- Dependency updates ----------------------------------------------------
+
+# .github/workflows/update-dependencies.yml checks PyPI daily for these packages
+# and opens a pull request raising their ">=" floors and bumping the version.
+[tool.update-dependencies]
+track = ["avogadro", "orb-models"]
+
 # --- Avogadro --------------------------------------------------------------
 
 [tool.avogadro]
-minimum-avogadro-version = "2.0"
+minimum-avogadro-version = "2.1"
 
 # Each feature is an entry in an array of tables, keyed by feature type. The
 # other supported types are electrostatic-models, file-formats, input-generators
